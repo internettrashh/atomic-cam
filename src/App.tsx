@@ -1,13 +1,15 @@
+import { ConnectButton, useConnection } from '@arweave-wallet-kit/react'
 import { useEffect, useRef, useState } from 'react'
 
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [photoTaken, setPhotoTaken] = useState<string | null>(null)
+  const { connected } = useConnection()
 
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
+        video: { facingMode: 'environment', width: 2048, height: 2048 },
         audio: false
       })
 
@@ -52,6 +54,26 @@ function App() {
     <div className="h-screen w-screen bg-black flex flex-col">
       {/* Camera viewport */}
       <div className="flex-1 relative bg-neutral-900">
+        <div className="text-white text-lg p-6 bg-black/30 backdrop-blur-sm rounded-lg shadow-lg">
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3 transition-all hover:translate-x-2">
+              <span className="text-2xl font-bold text-neutral-400">1</span>
+              <span className="font-bold text-red-400 text-xl">Color</span>
+              <span className="font-light">your sheet</span>
+            </div>
+            <div className="flex items-center space-x-3 transition-all hover:translate-x-2">
+              <span className="text-2xl font-bold text-neutral-400">2</span>
+              <span className="font-bold text-blue-400 text-xl">Scan</span>
+              <span className="font-light">your sheet</span>
+            </div>
+            <div className="flex items-center space-x-3 transition-all hover:translate-x-2">
+              <span className="text-2xl font-bold text-neutral-400">3</span>
+              <span className="font-bold text-green-300 text-xl">Mint</span>
+              <span className="font-light">your own</span>
+              <span className="font-bold text-purple-400">Atomic Asset</span>
+            </div>
+          </div>
+        </div>
         {photoTaken ? (
           <img
             src={photoTaken}
@@ -62,7 +84,12 @@ function App() {
             ref={videoRef}
             autoPlay
             playsInline
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-contain"
+            style={{
+              // transform: 'scaleX(-1)',  // Mirror the front camera if needed
+              objectFit: 'contain',
+              objectPosition: 'center'
+            }}
           />
         )}
       </div>
@@ -96,15 +123,12 @@ function App() {
           </>
         ) : (
           <>
-            <button className="w-12 h-12 rounded-full border-2 border-white/30 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-              </svg>
-            </button>
+            <ConnectButton />
 
             <button
+              disabled={!connected}
               onClick={takePhoto}
-              className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center"
+              className="w-20 h-20 rounded-full border-4 border-white disabled:opacity-50 flex items-center justify-center"
             >
               <div className="w-16 h-16 rounded-full bg-white"></div>
             </button>
